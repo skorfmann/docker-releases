@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM alpine:3.7
 
 ENV LANG=en_US.UTF-8
 
@@ -18,6 +18,8 @@ RUN addgroup -S mitmproxy && adduser -S -G mitmproxy mitmproxy \
         openssl-dev \
         python3 \
         python3-dev \
+        bash \
+        dumb-init \
     && python3 -m ensurepip \
     && LDFLAGS=-L/lib pip3 install -r /tmp/requirements.txt \
     && apk del --purge \
@@ -31,8 +33,7 @@ RUN addgroup -S mitmproxy && adduser -S -G mitmproxy mitmproxy \
 
 VOLUME /home/mitmproxy/.mitmproxy
 
-COPY docker-entrypoint.sh /usr/local/bin/
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 EXPOSE 8080 8081
 CMD ["mitmproxy"]
